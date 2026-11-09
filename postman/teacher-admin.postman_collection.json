@@ -1,0 +1,124 @@
+{
+  "info": {
+    "name": "Teacher Admin API",
+    "description": "Requests for the teacher and class administration API. Set the `baseUrl` variable to point at your server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:3000" }],
+  "item": [
+    {
+      "name": "Teachers",
+      "item": [
+        {
+          "name": "Register teacher",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/teachers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mary\",\n  \"subject\": \"Mathematics\",\n  \"email\": \"teachermary@gmail.com\",\n  \"contactNumber\": \"68129414\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["pm.test('201 Created', () => pm.response.to.have.status(201));"] }
+            }
+          ]
+        },
+        {
+          "name": "Register teacher – invalid body (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/teachers",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"\",\n  \"email\": \"not-an-email\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('has error message', () => pm.expect(pm.response.json().error).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List teachers",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/teachers" },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('data is an array', () => pm.expect(pm.response.json().data).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Classes",
+      "item": [
+        {
+          "name": "Add class",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/classes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"Primary 1\",\n  \"name\": \"Class 1A\",\n  \"teacherEmail\": \"teachermary@gmail.com\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["pm.test('201 Created', () => pm.response.to.have.status(201));"] }
+            }
+          ]
+        },
+        {
+          "name": "Add class – unknown teacher (404)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/classes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"Primary 2\",\n  \"name\": \"Class 2B\",\n  \"teacherEmail\": \"nobody@gmail.com\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] }
+            }
+          ]
+        },
+        {
+          "name": "List classes",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/classes" },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('data is an array', () => pm.expect(pm.response.json().data).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
